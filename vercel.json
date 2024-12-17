@@ -1,0 +1,16 @@
+{
+    "rewrites": [
+        {
+            "source": "/Products/:id",
+            "destination": "/Products/:id"
+        },
+        {
+            "source": "/Courses/:id",
+            "destination": "/Courses/:id"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/"
+        }
+    ]
+}
