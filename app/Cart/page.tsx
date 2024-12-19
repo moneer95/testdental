@@ -6,8 +6,24 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { useAppContext } from '@/context/AppContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Link from 'next/link';
+import { getCartPayload } from "../utils/cartUtils";
+
 
 function Page() {
+    const [cartItems, setCartItems] = useState<any[]>([]);
+    const payload = getCartPayload();
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const { setCart } = useAppContext();
+
+    const username = process.env.NEXT_PUBLIC_API_USERNAME;
+    const password = process.env.NEXT_PUBLIC_API_PASSWORD;
+    const encodedCredentials = btoa(`${username}:${password}`);
+
+
+    console.log(payload)
+
+    // Toast notifications
     const notify = (message: string) => {
         toast(message, {
             position: "top-right",
@@ -16,139 +32,87 @@ function Page() {
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
-            progress: undefined,
         });
     };
 
-    const [cartItems, setCartItems] = useState<any[]>([]);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    const { setCart } = useAppContext();
+    
 
-    console.log(cartItems)
+    const fetchCartData = async () => {
+
+        try {
+            const response = await fetch(
+                `${baseUrl}/api/method/ea_dental.api.get_cart_items`,
+                {
+                    method: "POST", // Change to POST
+                    headers: {
+                        Authorization: `Basic ${encodedCredentials}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ cart_items: payload }), // Send the payload in the body
+                }
+            );
+
+            const data = await response.json();
+
+
+            if (data.message) {
+                
+                // Check for sufficient stock
+                const validItems = data.message.filter((item: any, idx: any) => {
+                    if (item.stock_status == "Stock Unavailable") {
+                        handleRemoveFromCart(idx)
+                        // Notify user about the insufficient stock
+                        notify(`"${item.name}" removed from cart due to insufficient stock.`);
+                        return false; // Exclude this item from the valid items
+                    }
+                    return true; // Keep the item in the cart
+                });
+
+
+                
+                setCartItems(validItems);
+                
+                console.log(validItems)
+    
+            } else {
+                notify("Failed to fetch cart details.");
+            }
+        } catch (error) {
+            console.error("Error fetching cart data:", error);
+            notify("Error fetching cart details.");
+        }
+    };
+
 
     useEffect(() => {
-        const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        setCartItems(storedCart);
+        fetchCartData();
     }, []);
 
-    const handleRemoveFromCart = (index: any) => {
-        const updatedCart = cartItems.filter((item, i) => i !== index);
-        setCartItems(updatedCart);
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
-        setCart((prev) => !prev);
-        notify("Item removed from cart!");
-    };
 
-    const username = process.env.NEXT_PUBLIC_API_USERNAME;
-    const password = process.env.NEXT_PUBLIC_API_PASSWORD;
+const handleRemoveFromCart = (index: number) => {
+    // Remove the item from the cartItems state
+    setCartItems((prevCartItems) => {
+        const updatedCartItems = prevCartItems.filter((_, i) => i !== index);
+        return updatedCartItems; // Update state
+    });
 
-    // if (!username || !password) {
-    //   console.log("Environment variables for API credentials are not set.");
-    // }
+    // Remove the item from localStorage
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const updatedStoredCart = storedCart.filter((_: any, i: any) => i !== index);
+    localStorage.setItem("cart", JSON.stringify(updatedStoredCart));
 
-    const encodedCredentials = btoa(`${username}:${password}`);
+    // Notify other components and the user
+    setCart((prev) => !prev); // Trigger global cart update
+    notify("Item removed from cart!");
 
-    // Fetch package names and courses data
+};
 
-    const handleCheckOut = async () => {
-        // To store tickets data for courses
-        let updatedCartItems = [...cartItems];
 
-        for (const item of cartItems) {
-            if (item.item === "course") {
-                try {
-                    // Fetch the course tickets based on the slug
-                    const response = await fetch(
-                        `https://backend.ea-dental.com/api/method/ea_dental.api.get_course_from_slug?slug=${item.slug}`,
-                        {
-                            method: "GET",
-                            headers: {
-                                Authorization: `Basic ${encodedCredentials}`,
-                                "Content-Type": "application/json",
-                            },
-                        }
-                    );
-                    const responseJson = await response.json();
 
-                    if (responseJson.message && responseJson.message[0]?.tickets) {
-                        const courseTickets = responseJson.message[0].tickets;
+    const handleCheckout = () => {
+        // Logic to proceed to the checkout page
 
-                        // Check if the selected ticket is out of stock
-                        const isTicketOutOfStock = courseTickets.some(
-                            (ticket: any) =>
-                                ticket.name === item.selectedTicket.name && ticket.in_stock === 0
-                        );
 
-                        if (isTicketOutOfStock) {
-                            // Notify user about the out-of-stock course ticket
-                            notify(`The course ${item.name} with the selected ticket is out of stock!`);
-
-                            // Remove the course from updatedCartItems
-                            updatedCartItems = updatedCartItems.filter(
-                                (cartItem) => cartItem.slug !== item.slug
-                            );
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error fetching course data:", error);
-                }
-            } else if (item.item === "product") {
-                try {
-                    // Fetch the course tickets based on the slug
-                    const response = await fetch(
-                        `https://backend.ea-dental.com/api/resource/Products/${item.product_name}`,
-                        {
-                            method: "GET",
-                            headers: {
-                                Authorization: `Basic ${encodedCredentials}`,
-                                "Content-Type": "application/json",
-                            },
-                        }
-                    );
-                    const responseJson = await response.json();
-
-                    if (responseJson.data && responseJson.data.variations) {
-                        const courseTickets = responseJson.data.variations;
-
-                        // Check if the selected ticket is out of stock
-                        const isTicketOutOfStock = courseTickets.some(
-                            (variation: any) =>
-                                variation.variation_name === item.variationName && variation.in_stock === 0
-                        );
-
-                        if (isTicketOutOfStock) {
-                            // Notify user about the out-of-stock course ticket
-                            notify(`The course ${item.name} with the selected ticket is out of stock!`);
-
-                            // Remove the course from updatedCartItems
-                            updatedCartItems = updatedCartItems.filter(
-                                (cartItem) => cartItem.slug !== item.slug
-                            );
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error fetching course data:", error);
-                }
-            }
-        }
-
-        // Separate the items based on their stock availability
-        const outOfStockItems = updatedCartItems.filter((item) => item.stock === "0");
-        const inStockItems = updatedCartItems.filter((item) => item.stock !== "0");
-
-        // Notify for out-of-stock items and remove them from the cart
-        outOfStockItems.forEach((item) => {
-            notify(`Item ${item.name} is out of stock`);
-        });
-
-        // Update the cart with only in-stock items
-        setCartItems(inStockItems);
-        localStorage.setItem("cart", JSON.stringify(inStockItems));
-        setCart((prev) => !prev);
-
-        if (outOfStockItems.length === 0) {
-            notify("Proceeding to checkout!");
-        }
     };
 
 
@@ -166,27 +130,18 @@ function Page() {
                             >
                                 <div className="w-[20%] h-full">
                                     <Image
-                                        src={`${baseUrl}${item.course_image || item.image || ''}`}
+                                        src={`${baseUrl}${item.image || ''}`}
                                         width={1000}
                                         height={1000}
-                                        alt={item.course_name || item.product_name || ''}
+                                        alt={item.name || "item image"}
                                         className="w-full h-full rounded-xl object-cover object-center"
                                     />
                                 </div>
 
-                                <div className="flex flex-col justify-start px-3 items-start h-full w-[60%]">
-                                    <h2 className="text-[18px] font-semibold">
-                                        {item.course_name || item.product_name || 'No Name'}
-                                    </h2>
-                                    <p className="text-textBlack font-medium">{item.category || ''}</p>
-                                    <h3>Quantity : {item.quantity}</h3>
-                                    <h3>variationName : {item.variationName}</h3>
-                                    {item?.selectedTicket?.start_time !== undefined &&
-                                        item?.selectedTicket?.end_time !== undefined ? (
-                                        <p>{`${item?.selectedTicket?.start_time} - ${item?.selectedTicket?.end_time}`}</p>
-                                    ) : (
-                                        <p>N/A</p>
-                                    )}
+                                <div className="flex flex-col justify-start py-2 px-5 items-start h-full w-[60%]">
+                                    <h2 className="text-[18px] font-semibold">{item.name}</h2>
+                                    <p className="text-textBlack font-medium">{item.doctype}</p>
+                                    <h3>Quantity: {item.quantity}</h3>
                                 </div>
 
                                 <div className="w-[20%] h-full flex flex-col justify-between items-end">
@@ -197,7 +152,7 @@ function Page() {
                                         <RiDeleteBinLine />
                                     </div>
                                     <h3 className="text-[18px] font-semibold">
-                                        £{item.price || 0}
+                                        £{item.total}
                                     </h3>
                                 </div>
                             </div>
@@ -211,19 +166,20 @@ function Page() {
                         <h3>SubTotal</h3>
                         <h3>
                             £
-                            {cartItems.reduce((total, item) => total + (Number(item.price) || 0), 0)}
+                            {cartItems.reduce((total, item) => total + (Number(item.total) || 0), 0)}
                         </h3>
                     </div>
-                    <button
-                        onClick={handleCheckOut}
-                        className="bg-primaryPurple h-[52px] rounded-xl text-white font-medium w-full"
-                    >
-                        Continue to check out
-                    </button>
-                    <p className="text-[14px] text-textBlack text-center">
-                        Taxes & shipping calculated at checkout
-                    </p>
+                    <Link href="/checkout">
+                        <button
+                            onClick={handleCheckout}
+                            className="w-full bg-[#22207E] text-white py-2 px-4 rounded-md mt-4 hover:bg-[#22207E] transition"
+                        >
+                            Proceed to Checkout
+                        </button>
+                    </Link>
+
                 </div>
+
             </div>
         </div>
     );

@@ -24,6 +24,7 @@ function Page() {
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState('');
   const [variationName, setVariationName] = useState('');
+  const [variationId, setVariationId] = useState('');
   const [stock, setStock] = useState('');
   let Variations = []
   let childProduct = []
@@ -38,7 +39,6 @@ function Page() {
   }
 
 
-  console.log(childProduct)
 
   const notify = (message: string) => {
     toast(message, {
@@ -57,19 +57,19 @@ function Page() {
   const handleSelectChange = (event: any) => {
     const selectedValue = event.target.value;
     setSelectedOption(selectedValue);
-    console.log(selectedValue)
+
 
     // Split the string into parts
     const parts = selectedValue.split(',').map((item: string) => item.trim());
 
     // Ensure there are two parts and set them separately
-    if (parts.length === 3) {
+    if (parts.length) {
       setVariationName(parts[0]); // e.g., "Endo 29"
       setPrice(parts[1]); // e.g., "1"
       setStock(parts[2]); // e.g., "2"
+      setVariationId(parts[3]); // e.g., "hkgjdfy"
     }
   };
-
 
 
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
@@ -196,6 +196,8 @@ function Page() {
             item.variationName === variationName
         );
 
+        
+
         if (cartIndex > -1) {
           // If product already exists, update its quantity
           storedCart[cartIndex].quantity += quantity; // Increase the quantity by the selected quantity
@@ -206,10 +208,10 @@ function Page() {
             ...slugCourse,
             price: price,
             variationName: variationName,
+            variationId: variationId,
             stock: stock,
             quantity: quantity,
             item: "product"
-
           };
           storedCart.push(newCartItem);
           notify("Product added to cart");
@@ -297,7 +299,7 @@ function Page() {
                 >
                   <option value="" disabled >-- Select an option --</option>
                   {Variations.map((variation: any, index: number) => (
-                    <option key={index} value={`${variation.variation_name},  ${variation.price} , ${variation.in_stock}`}>
+                    <option key={index} value={`${variation.variation_name},  ${variation.price} , ${variation.in_stock}, ${variation.name}`}>
                       {variation.variation_name}
                     </option>
                   ))}
