@@ -66,7 +66,7 @@ export async function POST(req) {
                 product_data: {
                   name: item.name,
                   metadata: {
-                    array_data: JSON.stringify(item), // Serialize the array
+                    additional_data: JSON.stringify(item), // Serialize the array
                   },
                 },
                 unit_amount: item.price * 100,
