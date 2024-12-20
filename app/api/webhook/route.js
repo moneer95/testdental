@@ -1,55 +1,42 @@
-
-import { buffer } from 'micro';
+import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe("sk_test_51PVRD2K1xhAcvKUPUmROPyTxMKMf6wvbNvJzbI3V2Hb28MEjbyW54sAifxvep58oCQXpeBuYAmQu118P2I1vnBgW00H1HmD2KL", {
-    apiVersion: '2024-06-20',
-});
+const stripe = new Stripe('sk_test_51PVRD2K1xhAcvKUPUmROPyTxMKMf6wvbNvJzbI3V2Hb28MEjbyW54sAifxvep58oCQXpeBuYAmQu118P2I1vnBgW00H1HmD2KL');
+const endpointSecret = "whsec_1581785db894f308cc5a0f5574bdfd3d9342754ad5e70fd875e951bec2f35429";
 
-export const config = {
-    api: {
-        bodyParser: false, // Required by Stripe for raw body
-    },
-};
+export async function POST(req) {
+  const sig = req.headers.get('stripe-signature');
+  let event;
 
-export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        const endpointSecret = "whsec_1581785db894f308cc5a0f5574bdfd3d9342754ad5e70fd875e951bec2f35429";
+  try {
+    const rawBody = await req.text();
+    event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
+  }
 
-        let event;
+  switch (event.type) {
+    case 'checkout.session.completed':
+      const session = event.data.object;
 
-        try {
-            // Get raw body to verify signature
-            const rawBody = await buffer(req);
-            const signature = req.headers['stripe-signature'];
+      console.log('Checkout session completed:', session);
 
-            // Verify the signature
-            event = stripe.webhooks.constructEvent(
-                rawBody.toString(),
-                signature,
-                endpointSecret
-            );
+      // Fetch line items using the session ID
+      const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
 
-            console.log('✅ Webhook verified:', event);
+      console.log('Line Items:', lineItems.data);
 
-            // Handle the event
-            switch (event.type) {
-                case 'charge.succeeded':
-                    const charge = event.data.object;
-                    console.log('Charge succeeded:', charge);
-                    break;
-                // Handle other events here
-                default:
-                    console.log(`Unhandled event type: ${event.type}`);
-            }
+      // You can now access line items details here
+      lineItems.data.forEach(item => {
+        console.log(`Item: ${item.description}, Quantity: ${item.quantity}, Price: ${item.price.unit_amount}`);
+      });
 
-            res.status(200).send({ received: true });
-        } catch (err) {
-            console.error('❌ Webhook signature verification failed:', err.message);
-            res.status(400).send(`Webhook Error: ${err.message}`);
-        }
-    } else {
-        res.setHeader('Allow', 'POST');
-        res.status(405).send('Method Not Allowed');
-    }
+      break;
+
+    default:
+      console.log(`Unhandled event type: ${event.type}`);
+  }
+
+  return NextResponse.json({ received: true }, { status: 200 });
 }

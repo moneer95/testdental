@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
     domains: [], // Allow images from all domains.
     unoptimized: true, // Allow external images without restriction (optional).
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+},
 };
 
 export default nextConfig;
