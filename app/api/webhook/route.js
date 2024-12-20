@@ -14,6 +14,9 @@ export async function POST(req) {
   const sig = req.headers.get('stripe-signature'); // Retrieve the Stripe signature header
   let event;
 
+  console.log('Stripe Signature:', sig);
+
+
   try {
     // Use req.text() to get the raw request body as a string
     const rawBody = await req.text();
