@@ -1,48 +1,40 @@
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
 
-import Stripe from 'stripe';
-
-const stripe = new Stripe("sk_test_51PVRD2K1xhAcvKUPUmROPyTxMKMf6wvbNvJzbI3V2Hb28MEjbyW54sAifxvep58oCQXpeBuYAmQu118P2I1vnBgW00H1HmD2KL"); // Your Stripe Secret Key
-const endpointSecret = "whsec_TlHGKp5kmrxnuTsQTSxuiJ0R6lJzDc1P"; // Your Webhook Secret
-
-export const config = {
-  api: {
-    bodyParser: false, // Disable default body parsing to handle raw request body
-  },
-};
+const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SK);
 
 export async function POST(req) {
-  const sig = req.headers.get('stripe-signature'); // Retrieve the Stripe signature header
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const sig = req.headers.get("stripe-signature");
+
   let event;
 
-  console.log('Stripe Signature:', sig);
-
-
   try {
-    // Use req.text() to get the raw request body as a string
-    const rawBody = await req.text();
-
-    // Verify the webhook signature
-    event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
-
-    console.log('✅ Webhook verified:', event);
+    const rawBody = await req.text(); // Get raw request body
+    event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret); // Verify event signature
   } catch (err) {
-    console.error(`❌ Webhook Error: ${err.message}`);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+    console.error("Webhook signature verification failed:", err.message);
+    return NextResponse.json({ error: "Webhook signature verification failed" }, { status: 400 });
   }
 
-  // Handle the event
-  switch (event.type) {
-    case 'charge.succeeded':
-      const session = event.data.object;
-      console.log('✅ Checkout session completed:', session);
+  if (event.type === "charge.succeeded") {
+    const session = event.data.object; // Checkout Session object
 
-      // Add your business logic here, such as updating the database
-      break;
+    try {
+      // Fetch line items using the session ID
+      const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
 
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
+      console.log("Line Items:", lineItems.data);
+
+      // Process line items here
+      lineItems.data.forEach((item) => {
+        console.log(`Item: ${item.description}, Quantity: ${item.quantity}, Price: ${item.price.unit_amount}`);
+      });
+    } catch (err) {
+      console.error("Failed to fetch line items:", err.message);
+      return NextResponse.json({ error: "Failed to fetch line items" }, { status: 500 });
+    }
   }
 
-  // Respond to Stripe that the event was successfully received
-  return new Response('Event received', { status: 200 });
+  return NextResponse.json({ received: true }, { status: 200 });
 }
