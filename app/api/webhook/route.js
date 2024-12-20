@@ -2,7 +2,7 @@
 import Stripe from 'stripe';
 
 const stripe = new Stripe("sk_test_51PVRD2K1xhAcvKUPUmROPyTxMKMf6wvbNvJzbI3V2Hb28MEjbyW54sAifxvep58oCQXpeBuYAmQu118P2I1vnBgW00H1HmD2KL"); // Your Stripe Secret Key
-const endpointSecret = "whsec_1581785db894f308cc5a0f5574bdfd3d9342754ad5e70fd875e951bec2f35429"; // Your Webhook Secret
+const endpointSecret = "whsec_TlHGKp5kmrxnuTsQTSxuiJ0R6lJzDc1P"; // Your Webhook Secret
 
 export const config = {
   api: {
