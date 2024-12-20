@@ -48,12 +48,12 @@ export async function POST(req) {
           for (const item of lineItems.data) {
             const metadata = item.metadata;
             if (metadata.additional_data) {
-              const additionalData = JSON.parse(metadata.additional_data); // Parse JSON back into an array
+              const additionalData = JSON.parse(metadata); // Parse JSON back into an array
               console.log("Additional Data:", additionalData);
 
               // Process each object in the array
               additionalData.forEach(data => {
-                console.log(`Product: ${data.name}, Price: ${data.price}, Stock: ${data.available_stock}`);
+                console.log(`Product: ${data}, Price: ${data}, Stock: ${data}`);
               });
             }
           }
