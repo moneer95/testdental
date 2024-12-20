@@ -10,7 +10,7 @@ export const config = {
 };
 
 export async function POST(req) {
-  const sig = req.headers.get("stripe-signature"); // Retrieve the Stripe signature header
+  const sig = req.headers.get("stripe-signature");
   let event;
 
   try {
@@ -24,20 +24,34 @@ export async function POST(req) {
 
   // Handle the event
   switch (event.type) {
-    case "charge.succeeded": // Correct event type for fetching line items
-      const session = event.data.object; // The Checkout Session object
-      console.log("✅ Checkout session completed:", session);
+    case "charge.succeeded": // Handle the charge.succeeded event
+      const charge = event.data.object; // The charge object
+      console.log("✅ Charge succeeded:", charge);
 
       try {
-        // Fetch line items using the session ID
-        const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+        // Retrieve the Payment Intent
+        const paymentIntent = await stripe.paymentIntents.retrieve(charge.payment_intent);
 
-        console.log("✅ Line Items:", lineItems.data);
-
-        // Process line items here (e.g., save to your database)
-        lineItems.data.forEach((item) => {
-          console.log(`Item: ${item.description}, Quantity: ${item.quantity}, Price: ${item.price.unit_amount}`);
+        // Retrieve the Checkout Session using the Payment Intent
+        const session = await stripe.checkout.sessions.list({
+          payment_intent: paymentIntent.id,
         });
+
+        if (session.data.length > 0) {
+          const sessionId = session.data[0].id;
+
+          // Fetch line items using the session ID
+          const lineItems = await stripe.checkout.sessions.listLineItems(sessionId);
+
+          console.log("✅ Line Items:", lineItems.data);
+
+          // Process line items
+          lineItems.data.forEach((item) => {
+            console.log(`Item: ${item.description}, Quantity: ${item.quantity}, Price: ${item.price.unit_amount}`);
+          });
+        } else {
+          console.error("❌ No matching Checkout Session found");
+        }
       } catch (err) {
         console.error("❌ Failed to fetch line items:", err.message);
         return new Response("Failed to fetch line items", { status: 500 });
