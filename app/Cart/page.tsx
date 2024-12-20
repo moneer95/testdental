@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
@@ -11,6 +11,10 @@ import { getCartPayload } from "../utils/cartUtils";
 
 
 function Page() {
+
+    if (typeof window === "undefined") return; // Ensure it runs only in the browser
+
+
     const [cartItems, setCartItems] = useState<any[]>([]);
     const payload = getCartPayload();
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
