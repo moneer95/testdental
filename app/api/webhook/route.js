@@ -46,8 +46,12 @@ export async function POST(req) {
           console.log("✅ Line Items:", lineItems.data);
 
           // Process line items
-          lineItems.data.forEach((item) => {
-            console.log(`Item: ${JSON.stringify(item)}`);
+          lineItems.data.forEach( async (item) => {
+            console.log(`Item: ${item}, Quantity: ${item.quantity}, Price: ${item.price.unit_amount}`);
+
+            const product = await stripe.products.retrieve(item.price.product);
+            console.log("Metadata:", product.metadata);
+          
           });
         } else {
           console.error("❌ No matching Checkout Session found");
