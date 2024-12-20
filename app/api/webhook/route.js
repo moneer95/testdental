@@ -24,7 +24,7 @@ export async function POST(req) {
 
   // Handle the event
   switch (event.type) {
-    case "checkout.session.completed":
+    case "charge.succeeded":
       const session = event.data.object; // The Checkout Session object
       console.log("✅ Checkout session completed:", session);
 
