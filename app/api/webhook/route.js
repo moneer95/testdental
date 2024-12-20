@@ -47,7 +47,7 @@ export async function POST(req) {
 
           // Process line items
           lineItems.data.forEach((item) => {
-            console.log(`Item: ${item.description}, Quantity: ${item.quantity}, Price: ${item.price.unit_amount}`);
+            console.log(`Item: ${item}`);
           });
         } else {
           console.error("❌ No matching Checkout Session found");
