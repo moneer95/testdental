@@ -47,7 +47,7 @@ export async function POST(req) {
 
           for (const item of lineItems.data) {
             const metadata = item.metadata;
-            if (metadata.additional_data) {
+            if (metadata) {
               const additionalData = JSON.parse(metadata); // Parse JSON back into an array
               console.log("Additional Data:", additionalData);
 
