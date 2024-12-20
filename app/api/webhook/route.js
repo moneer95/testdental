@@ -41,22 +41,19 @@ export async function POST(req) {
           const sessionId = session.data[0].id;
 
           // Fetch line items using the session ID
-          const lineItems = await stripe.checkout.sessions.listLineItems(sessionId);
+          const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, {
+            expand: ['data.price.product'],
+          });
 
           console.log("✅ Line Items:", lineItems.data);
 
-          for (const item of lineItems.data) {
-            const metadata = item.metadata;
-            if (metadata) {
-              const additionalData = JSON.parse(metadata); // Parse JSON back into an array
-              console.log("Additional Data:", additionalData);
+      // Process line items and their metadata
+      lineItems.data.forEach((item) => {
+        const metadata = item.price.product.metadata;
+        console.log(`Item: ${item.description}`);
+        console.log(`Metadata:`, metadata);
+      });
 
-              // Process each object in the array
-              additionalData.forEach(data => {
-                console.log(`Product: ${data}, Price: ${data}, Stock: ${data}`);
-              });
-            }
-          }
 
         } else {
           console.error("❌ No matching Checkout Session found");
