@@ -10,15 +10,15 @@ export default async function decreaseStock(metadata) {
         const response = await axios.post(
             url,
             {
-                doctype: metadata.doctype,
+                doctype: metadata.doctype, 
                 docname: metadata.id,
                 child_id: metadata.child_id,
             },
             {
                 headers: {
-                    Authorization: `Basic ${
+                    Authorization: `Basic ${Buffer.from(
                         `${process.env.NEXT_PUBLIC_API_USERNAME}:${process.env.NEXT_PUBLIC_API_PASSWORD}`
-                    }`,
+                    ).toString("base64")}`,
                     "Content-Type": "application/json",
                 },
             }
