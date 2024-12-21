@@ -15,6 +15,9 @@ function divideItems(itemsMetadata) {
                 break;
             case "Course":
                 handleCoursePurchase(metadata)
+                break;
+            default:
+                break;
         }
     });
 }
