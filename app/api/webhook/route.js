@@ -46,7 +46,6 @@ export async function POST(req) {
             expand: ['data.price.product'],
           });
 
-          console.log("✅ Line Items:", lineItems.data);
 
           divideItems(lineItems)
 
