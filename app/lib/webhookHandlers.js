@@ -1,7 +1,7 @@
 import decreaseStock from "./decreaseStock"
 
 export async function divideItems(itemsMetadata) {
-    
+
     console.log(itemsMetadata.data)
 
     for (const item of itemsMetadata.data) {
@@ -9,7 +9,7 @@ export async function divideItems(itemsMetadata) {
         console.log(`Metadata:`, metadata);
 
         console.log(metadata.doctype);
- 
+
         // switch (metadata.doctype) {
         //     case "Products":
         await handleProductPurchase(metadata);
@@ -26,9 +26,15 @@ export async function divideItems(itemsMetadata) {
 }
 
 async function handleProductPurchase(metadata) {
-    await decreaseStock(metadata);
+    try{
+        await decreaseStock(metadata);
+    } catch (error) {
+        console.error("Error in divideItems:", error.message);
+    }
 }
 
 async function handleCoursePurchase(metadata) {
     console.log("Handling course purchase:", metadata);
 }
+
+
