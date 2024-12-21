@@ -1,36 +1,37 @@
 import decreaseStock from "./decreaseStock";
 
-function divideItems(itemsMetadata) {
+async function divideItems(itemsMetadata) {
     // Process line items and their metadata
-    itemsMetadata.data.forEach((item) => {
+    for (const item of itemsMetadata.data) {
         const metadata = JSON.parse(item.price.product.metadata.additional_data);
-        // console.log(`Item: ${item.description}`);
-        console.log(`Metadata:`, metadata);
 
-        console.log(metadata.doctype)
+        console.log("Metadata:", metadata);
+        console.log("Doctype:", metadata.doctype);
 
-        switch(metadata.doctype){
+        switch (metadata.doctype) {
             case "Products":
-                handleProductPurchase(metadata)
+                await handleProductPurchase(metadata); // Await here
                 break;
             case "Course":
-                handleCoursePurchase(metadata)
+                await handleCoursePurchase(metadata); // Await if asynchronous
                 break;
             default:
+                console.log("Unknown doctype:", metadata.doctype);
                 break;
         }
-    });
+    }
 }
 
-function handleProductPurchase(metadata){
-    decreaseStock(metadata)
+async function handleProductPurchase(metadata) {
+    console.log("Handling product purchase for:", metadata);
+    await decreaseStock(metadata); // Await here
 }
 
-function handleCoursePurchase(metadata){
-
+async function handleCoursePurchase(metadata) {
+    console.log("Handling course purchase for:", metadata);
+    // Add your course-related logic here
 }
-
 
 module.exports = {
-    divideItems
-}
+    divideItems,
+};

@@ -43,10 +43,3 @@ export default async function decreaseStock(metadata) {
     }
 }
 
-// Example Usage
-const metadata = {
-    doctype: "Products",
-    docname: "Complete Kit",    
-    child_id: "f587b361c2", 
-};
-
