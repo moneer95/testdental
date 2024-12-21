@@ -32,5 +32,3 @@ const metadata = {
     docname: "Complete Kit",     // Replace with your document name
     child_id: "f587b361c2", // Replace with your child table row ID
 };
-
-decreaseStock(metadata);
