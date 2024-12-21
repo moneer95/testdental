@@ -2,10 +2,25 @@
 function divideItems(itemsMetadata) {
     // Process line items and their metadata
     itemsMetadata.data.forEach((item) => {
-        const metadata = item.price.product.metadata;
-        console.log(`Item: ${item.description}`);
+        const metadata = item.price.product.metadata.additional_data;
+        // console.log(`Item: ${item.description}`);
         console.log(`Metadata:`, metadata);
+
+        switch(metadata.doctype){
+            case "Products":
+                handleProductPurchase(metadata)
+                break;
+            case "Course":
+                handleCoursePurchase(metadata)
+        }
     });
+}
+
+function handleProductPurchase(metadata){
+    
+}
+
+function handleCoursePurchase(metadata){
 
 }
 
