@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default async function decreaseStock(metadata) {
+export default async function decreaseStock(metadata, child_table) {
     try {
         // Debug environment variables
         console.log("Base URL:", process.env.NEXT_PUBLIC_BASE_URL);
