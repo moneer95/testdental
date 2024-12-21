@@ -16,6 +16,8 @@ export default async function decreaseStock(metadata) {
             }
         );
 
+        console.log(response.data.message)
+
         if (response.data.status === "success") {
             console.log("✅ Stock updated successfully:", response.data.updated_stock);
         } else {
