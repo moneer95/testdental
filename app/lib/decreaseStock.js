@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-  async function decreaseStock(metadata) {
+export default async function decreaseStock(metadata) {
     try {
         // Debug environment variables
         console.log("Base URL:", process.env.NEXT_PUBLIC_BASE_URL);
@@ -44,5 +44,3 @@ const axios = require("axios");
         }
     }
 }
-
-module.exports = { decreaseStock };
