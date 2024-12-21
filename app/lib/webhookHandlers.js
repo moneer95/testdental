@@ -3,7 +3,7 @@ import decreaseStock from "./decreaseStock";
 function divideItems(itemsMetadata) {
     // Process line items and their metadata
     itemsMetadata.data.forEach((item) => {
-        const metadata = item.price.product.metadata.additional_data;
+        const metadata = JSON.parse(item.price.product.metadata.additional_data);
         // console.log(`Item: ${item.description}`);
         console.log(`Metadata:`, metadata);
 
