@@ -10,16 +10,16 @@ export async function divideItems(itemsMetadata) {
 
         console.log(metadata.doctype);
 
-        // switch (metadata.doctype) {
-        //     case "Products":
+        switch (metadata.doctype) {
+            case "Products":
         await handleProductPurchase(metadata);
-        //         break;
-        //     case "Course":
-        //         await handleCoursePurchase(metadata);
-        //         break;
-        //     default:
-        //         break;
-        // }
+                break;
+            case "Course":
+                await handleCoursePurchase(metadata);
+                break;
+            default:
+                break;
+        }
 
         console.log("end for")
     }
