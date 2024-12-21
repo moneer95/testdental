@@ -7,6 +7,8 @@ function divideItems(itemsMetadata) {
         // console.log(`Item: ${item.description}`);
         console.log(`Metadata:`, metadata);
 
+        console.log(metadata.doctype)
+
         switch(metadata.doctype){
             case "Products":
                 handleProductPurchase(metadata)
