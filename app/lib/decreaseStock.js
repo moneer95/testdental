@@ -52,7 +52,7 @@ export default async function decreaseStock() {
 }
 
 
-metadata = {
+const metadata = {
     id: 'Complete Kit',
     child_id: 'af6d35a1bb',
     doctype: 'Products',
