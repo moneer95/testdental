@@ -1,4 +1,5 @@
-const axios = require('axios')
+import axios from "axios";
+
 export default async function decreaseStock(metadata) {
     try {
         // Debug environment variables
@@ -14,7 +15,7 @@ export default async function decreaseStock(metadata) {
                 doctype: metadata.doctype, 
                 docname: metadata.id,
                 child_id: metadata.child_id,
-                quan: metadata.quantity
+                
             },
             {
                 headers: {
