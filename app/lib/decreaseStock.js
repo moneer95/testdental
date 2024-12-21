@@ -4,16 +4,16 @@ export default async function decreaseStock(metadata) {
     try {
         // Debug environment variables
         console.log("Base URL:", process.env.NEXT_PUBLIC_BASE_URL);
-        console.log("Username:", process.env.NEXT_PUBLIC_API_USERNAME);
-        console.log("Password:", process.env.NEXT_PUBLIC_API_PASSWORD);
 
         const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/method/ea_dental.api.decrease_stock`;
-        console.log("Request URL:", url);
-        console.log("Metadata being sent:", metadata);
 
         const response = await axios.post(
             url,
-            metadata,
+            {
+                doctype: metadata.doctype, // Pass doctype
+                docname: metadata.id, // Pass docname (assuming `id` is the docname)
+                child_id: metadata.child_id, // Pass child_id
+            },
             {
                 headers: {
                     Authorization: `Basic ${Buffer.from(
@@ -45,8 +45,8 @@ export default async function decreaseStock(metadata) {
 
 // Example Usage
 const metadata = {
-    doctype: "Products", // Replace with your doctype
-    docname: "Complete Kit",     // Replace with your document name
-    child_id: "f587b361c2", // Replace with your child table row ID
+    doctype: "Products",
+    docname: "Complete Kit",    
+    child_id: "f587b361c2", 
 };
 
