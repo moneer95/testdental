@@ -47,7 +47,7 @@ export async function POST(req) {
           });
 
 
-          divideItems(lineItems)
+          await divideItems(lineItems)
 
 
 
