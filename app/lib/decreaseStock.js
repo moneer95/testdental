@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default async function decreaseStock() {
+export default async function decreaseStock(metadata) {
     try {
         // Debug environment variables
         console.log("Base URL:", process.env.NEXT_PUBLIC_BASE_URL);
@@ -31,10 +31,10 @@ export default async function decreaseStock() {
 
         if (response.data.message.status === "success") {
             console.log("✅ Stock updated successfully:", response.data.message.updated_stock);
-            return;
+            return 1;
         } else {
             console.error("❌ Error updating stock:", response.data.message);
-            return;
+            return 1;
         }
     } catch (error) {
         if (error.response) {
@@ -50,17 +50,3 @@ export default async function decreaseStock() {
         }
     }
 }
-
-
-const metadata = {
-    id: 'Complete Kit',
-    child_id: 'af6d35a1bb',
-    doctype: 'Products',
-    name: 'Complete Kit - Endo 29',
-    price: 79,
-    quantity: 1,
-    total: 79,
-    image: '/files/color_logo___no_background_690px.jpg',
-    available_stock: 7,
-    stock_status: 'In Stock'
-  }
