@@ -1,4 +1,5 @@
 import decreaseStock from "./decreaseStock"
+
 export async function divideItems(itemsMetadata) {
     for (const item of itemsMetadata.data) {
         const metadata = JSON.parse(item.price.product.metadata.additional_data);
