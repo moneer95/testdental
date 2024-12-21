@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-async function decreaseStock(metadata) {
+export default async function decreaseStock(metadata) {
     try {
         console.log(process.env.NEXT_PUBLIC_BASE_URL)
         const response = await axios.post(

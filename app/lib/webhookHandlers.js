@@ -1,3 +1,4 @@
+import decreaseStock from "./decreaseStock";
 
 function divideItems(itemsMetadata) {
     // Process line items and their metadata
@@ -17,7 +18,7 @@ function divideItems(itemsMetadata) {
 }
 
 function handleProductPurchase(metadata){
-    
+    decreaseStock(metadata)
 }
 
 function handleCoursePurchase(metadata){
