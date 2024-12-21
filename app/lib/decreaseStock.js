@@ -1,66 +1,47 @@
-import decreaseStock from "./decreaseStock";
+const axios = require("axios");
 
-async function divideItems(itemsMetadata) {
+export default async function decreaseStock(metadata) {
     try {
-        for (const item of itemsMetadata.data) {
-            console.log("Processing item:", item);
+        // Debug environment variables
+        console.log("Base URL:", process.env.NEXT_PUBLIC_BASE_URL);
 
-            // Safely parse metadata
-            let metadata;
-            try {
-                metadata = JSON.parse(item.price.product.metadata.additional_data);
-            } catch (error) {
-                console.error("Error parsing metadata:", error.message, item.price.product.metadata);
-                continue; // Skip this item if metadata cannot be parsed
+        const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/method/ea_dental.api.decrease_stock`;
+
+        console.log(metadata.doctype, metadata.id, metadata.child_id)
+
+        const response = await axios.post(
+            url,
+            {
+                doctype: metadata.doctype, 
+                docname: metadata.id,
+                child_id: metadata.child_id,
+            },
+            {
+                headers: {
+                    Authorization: `Basic ${Buffer.from(
+                        `${process.env.NEXT_PUBLIC_API_USERNAME}:${process.env.NEXT_PUBLIC_API_PASSWORD}`
+                    ).toString("base64")}`,
+                    "Content-Type": "application/json",
+                },
             }
+        );
 
-            console.log("Metadata:", metadata);
+        console.log("API Response:", response.data);
 
-            // Check and process metadata
-            if (!metadata || !metadata.doctype) {
-                console.error("Invalid metadata structure:", metadata);
-                continue; // Skip this item if metadata is invalid
-            }
-
-            // Handle different types of metadata
-            switch (metadata.doctype) {
-                case "Products":
-                    console.log("Handling product purchase for:", metadata);
-                    await handleProductPurchase(metadata);
-                    break;
-                case "Course":
-                    console.log("Handling course purchase for:", metadata);
-                    await handleCoursePurchase(metadata);
-                    break;
-                default:
-                    console.warn("Unhandled doctype:", metadata.doctype);
-                    break;
-            }
+        if (response.data.status === "success") {
+            console.log("✅ Stock updated successfully:", response.data.updated_stock);
+        } else {
+            console.error("❌ Error updating stock:", response.data.message);
         }
     } catch (error) {
-        console.error("Error in divideItems:", error.message);
+        if (error.response) {
+            console.error("❌ API Response Error:", error.response.data);
+            console.error("❌ Status Code:", error.response.status);
+        } else if (error.request) {
+            console.error("❌ No Response from API:", error.request);
+        } else {
+            console.error("❌ Request Error:", error.message);
+        }
     }
 }
 
-async function handleProductPurchase(metadata) {
-    try {
-        console.log("Calling decreaseStock for product:", metadata);
-        const result = await decreaseStock(metadata);
-        console.log("Stock update result:", result);
-    } catch (error) {
-        console.error("Error handling product purchase:", error.message);
-    }
-}
-
-async function handleCoursePurchase(metadata) {
-    try {
-        console.log("Course purchase processing:", metadata);
-        // Add logic for handling courses here
-    } catch (error) {
-        console.error("Error handling course purchase:", error.message);
-    }
-}
-
-module.exports = {
-    divideItems,
-};

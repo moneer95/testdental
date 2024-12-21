@@ -1,4 +1,4 @@
-import decreaseStock from "../lib/decreaseStock"
+import decreaseStock from "./decreaseStock"
 
 export async function divideItems(itemsMetadata) {
     for (const item of itemsMetadata.data) {
