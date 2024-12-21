@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+// import {divideItems} from "../../lib/webhookHandlers"
 
 const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SK); // Your Stripe Secret Key
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET; // Your Webhook Secret
@@ -47,12 +48,9 @@ export async function POST(req) {
 
           console.log("✅ Line Items:", lineItems.data);
 
-      // Process line items and their metadata
-      lineItems.data.forEach((item) => {
-        const metadata = item.price.product.metadata;
-        console.log(`Item: ${item.description}`);
-        console.log(`Metadata:`, metadata);
-      });
+          divideItems(lineItems)
+
+
 
 
         } else {
