@@ -1,5 +1,4 @@
-const axios = require("axios");
-
+import axios from "axios";
 export default async function decreaseStock(metadata) {
     try {
         // Debug environment variables
