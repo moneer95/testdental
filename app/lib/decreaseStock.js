@@ -45,4 +45,4 @@ const axios = require("axios");
     }
 }
 
-module.exports = decreaseStock;
+module.exports = { decreaseStock };
