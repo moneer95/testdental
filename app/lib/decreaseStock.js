@@ -1,11 +1,11 @@
 const axios = require("axios");
 
-export default async function decreaseStock(metadata) {
+  async function decreaseStock(metadata) {
     try {
         // Debug environment variables
         console.log("Base URL:", process.env.NEXT_PUBLIC_BASE_URL);
 
-        const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/method/ea_dental.api.decrease_stock`;
+        const url = `${"https://backend.ea-dental.com"}/api/method/ea_dental.api.decrease_stock`;
 
         console.log(metadata.doctype, metadata.id, metadata.child_id)
 
@@ -19,7 +19,7 @@ export default async function decreaseStock(metadata) {
             {
                 headers: {
                     Authorization: `Basic ${Buffer.from(
-                        `${process.env.NEXT_PUBLIC_API_USERNAME}:${process.env.NEXT_PUBLIC_API_PASSWORD}`
+                        `${"f159677cbad15a9"}:${"cda008a8375b35e"}`
                     ).toString("base64")}`,
                     "Content-Type": "application/json",
                 },
@@ -28,8 +28,8 @@ export default async function decreaseStock(metadata) {
 
         console.log("API Response:", response.data);
 
-        if (response.data.status === "success") {
-            console.log("✅ Stock updated successfully:", response.data.updated_stock);
+        if (response.data.message.status === "success") {
+            console.log("✅ Stock updated successfully:", response.data.message.updated_stock);
         } else {
             console.error("❌ Error updating stock:", response.data.message);
         }
@@ -45,3 +45,4 @@ export default async function decreaseStock(metadata) {
     }
 }
 
+module.exports = decreaseStock;

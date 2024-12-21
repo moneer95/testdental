@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import {divideItems} from "../../lib/webhookHandlers"
+import { divideItems } from "../../lib/webhookHandlers"
 
 const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SK); // Your Stripe Secret Key
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET; // Your Webhook Secret

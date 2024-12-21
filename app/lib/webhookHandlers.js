@@ -1,6 +1,6 @@
-import decreaseStock from "./decreaseStock"
+const decreaseStock = require("./decreaseStock")
 
-export async function divideItems(itemsMetadata) {
+async function divideItems(itemsMetadata) {
     for (const item of itemsMetadata.data) {
         const metadata = JSON.parse(item.price.product.metadata.additional_data);
         console.log(`Metadata:`, metadata);
@@ -27,3 +27,7 @@ async function handleProductPurchase(metadata) {
 async function handleCoursePurchase(metadata) {
     console.log("Handling course purchase:", metadata);
 }
+
+
+
+module.exports = divideItems;
