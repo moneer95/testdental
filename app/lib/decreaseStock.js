@@ -7,7 +7,7 @@ export default async function decreaseStock(metadata) {
 
         const url = `${"https://backend.ea-dental.com"}/api/method/ea_dental.api.decrease_stock`;
 
-        console.log(metadata.doctype, metadata.id, metadata.child_id, child_table)
+        console.log(metadata.doctype, metadata.id, metadata.child_id)
 
         const response = await axios.post(
             url,

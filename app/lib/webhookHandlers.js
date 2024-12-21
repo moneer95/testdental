@@ -12,10 +12,10 @@ export async function divideItems(itemsMetadata) {
 
         switch (metadata.doctype) {
             case "Products":
-                await handleProductPurchase(metadata, "variations");
+                await handleProductPurchase(metadata);
                 break;
             case "Course":
-                await handleCoursePurchase(metadata, "tickets");
+                await handleCoursePurchase(metadata);
                 break;
             default:
                 break;
@@ -27,7 +27,7 @@ export async function divideItems(itemsMetadata) {
 
 async function handleProductPurchase(metadata) {
     try{
-        await decreaseStock(metadata);
+        await decreaseStock(metadata, "variations");
     } catch (error) {
         console.error("Error in divideItems:", error.message);
     }
@@ -35,7 +35,7 @@ async function handleProductPurchase(metadata) {
 
 async function handleCoursePurchase(metadata) {
     try{
-        await decreaseStock(metadata);
+        await decreaseStock(metadata, "tickets");
     } catch (error) {
         console.error("Error in divideItems:", error.message);
     }}
