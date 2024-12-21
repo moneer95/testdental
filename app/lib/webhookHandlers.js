@@ -30,4 +30,4 @@ async function handleCoursePurchase(metadata) {
 
 
 
-module.exports = divideItems;
+module.exports = { divideItems };
