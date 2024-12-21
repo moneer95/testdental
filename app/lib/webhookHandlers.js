@@ -10,6 +10,6 @@ function divideItems(itemsMetadata) {
 }
 
 
-module.exports({
+module.exports = {
     divideItems
-})
+}
