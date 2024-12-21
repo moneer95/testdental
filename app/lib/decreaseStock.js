@@ -30,17 +30,22 @@ export default async function decreaseStock(metadata) {
 
         if (response.data.message.status === "success") {
             console.log("✅ Stock updated successfully:", response.data.message.updated_stock);
+            return;
         } else {
             console.error("❌ Error updating stock:", response.data.message);
+            return;
         }
     } catch (error) {
         if (error.response) {
             console.error("❌ API Response Error:", error.response.data);
             console.error("❌ Status Code:", error.response.status);
+            return;
         } else if (error.request) {
             console.error("❌ No Response from API:", error.request);
+            return;
         } else {
             console.error("❌ Request Error:", error.message);
+            return;
         }
     }
 }
