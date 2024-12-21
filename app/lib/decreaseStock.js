@@ -7,6 +7,8 @@ export default async function decreaseStock(metadata) {
 
         const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/method/ea_dental.api.decrease_stock`;
 
+        console.log(metadata.doctype, metadata.id, metadata.child_id)
+
         const response = await axios.post(
             url,
             {
